@@ -1,0 +1,20 @@
+<Bindings>
+    <Binding name="VIMPREPEAT" default="'" header="VIMP">
+        Vimp_Repeat()
+    </Binding>
+    <Binding name="VIMPPREV" default="[">
+        Vimp_Prev()
+    </Binding>
+    <Binding name="VIMPNEXT" default="]">
+        Vimp_Next()
+    </Binding>
+    <Binding name="VIMPCLICK" default="SHIFT-'">
+        Vimp_Click()
+    </Binding>
+    <Binding name="VIMPDEC" default="SHIFT-[">
+        Vimp_Dec()
+    </Binding>
+    <Binding name="VIMPINC" default="SHIFT-]">
+        Vimp_Inc()
+    </Binding>
+</Bindings>
