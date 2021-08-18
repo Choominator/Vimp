@@ -5,3 +5,5 @@
 
 Vimp.lua
 Error.lua
+Reader.lua
+Keyboard.lua
