@@ -72,8 +72,8 @@ local function OnEvent(frame, event)
     if event ~= "UPDATE_BINDINGS" then
         return
     end
-    if GetBindingAction("'") == "" and not GetBindingKey("VIMPREPEAT") then
-        SetBinding("'", "VIMPREPEAT")
+    if GetBindingAction("'") == "" and not GetBindingKey("VIMPCLICK") then
+        SetBinding("'", "VIMPCLICK")
     end
     if GetBindingAction("[") == "" and not GetBindingKey("VIMPPREV") then
         SetBinding("[", "VIMPPREV")
@@ -81,8 +81,8 @@ local function OnEvent(frame, event)
     if GetBindingAction("]") == "" and not GetBindingKey("VIMPNEXT") then
         SetBinding("]", "VIMPNEXT")
     end
-    if GetBindingAction("SHIFT-'") == "" and not GetBindingKey("VIMPCLICK") then
-        SetBinding("SHIFT-'", "VIMPCLICK")
+    if GetBindingAction("SHIFT-'") == "" and not GetBindingKey("VIMPREPEAT") then
+        SetBinding("SHIFT-'", "VIMPREPEAT")
     end
     if GetBindingAction("SHIFT-[") == "" and not GetBindingKey("VIMPDEC") then
         SetBinding("SHIFT-[", "VIMPDEC")

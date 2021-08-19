@@ -16,11 +16,11 @@ local function IsEligible(frame)
 end
 
 local function GetStrings(frame)
-    if frame:IsForbidden() or not frame:IsVisible() then
+    if frame:IsForbidden() or not frame:IsShown() then
         return ""
     end
     local text = ""
-    if frame.GetText then
+    if frame.GetText and frame:GetText() and frame:GetText():find("%S") then
         text = frame:GetText() .. "\n"
     end
     if frame.GetChildren then
@@ -58,14 +58,14 @@ local function Text(frame)
     end
     local text = ""
     for index, region in ipairs({frame:GetRegions()}) do
-        if region:IsVisible() and region.GetText and region:GetText() and region:GetText():find("%S") then
+        if region:IsShown() and region.GetText and region:GetText() and region:GetText():find("%S") then
             text = text .. region:GetText() .. "\n"
         end
     end
     if frame:IsObjectType("Button") then
         text = text .. ReadTooltip(frame) .. "\n"
         if not text:find("%S") then
-            text = (frame:GetName() or "Anonymous") .. "\n"
+            text = (frame:GetName() or "") .. "\n"
         end
     end
     if not text:find("%S") then
@@ -104,18 +104,20 @@ local function Explore(frame, backward)
         end
     end
     local children = {frame:GetChildren()}
-    local first = 1
-    local last = #children
-    local increment = 1
-    if backward then
-        first, last = last, first
-        increment = -1
-    end
-    for index = first, last, increment do
-        local child = children[index]
-        local text = Explore(child, backward)
-        if text then
-            return text
+    if #children > 0 then
+        local first = 1
+        local last = #children
+        local increment = 1
+        if backward then
+            first, last = last, first
+            increment = -1
+        end
+        for index = first, last, increment do
+            local child = children[index]
+            local text = Explore(child, backward)
+            if text then
+                return text
+            end
         end
     end
     if backward and not focusedFrame then
@@ -134,9 +136,23 @@ local function Next(backward)
         focusedFrame = nil
         return
     end
-    local text = Explore(topFrame, backward) or Explore(topFrame, backward)
+    if not IsEligible(focusedFrame) then
+        focusedFrame = nil
+    end
+    local savedFocus = focusedFrame
+    local text = Explore(topFrame, backward)
     if not text then
-        Vimp_Read("Nothing to read")
+        focusedFrame = savedFocus
+        text = Text(focusedFrame)
+        if not text then
+            Vimp_Read("Nothing to read")
+            return
+        end
+        if not backward then
+            Vimp_Read("Last element\n" .. Text(focusedFrame))
+        else
+            Vimp_Read("First element\n" .. Text(focusedFrame))
+        end
         return
     end
     Vimp_Read(text)
@@ -145,6 +161,7 @@ end
 local function Click()
     if not focusedFrame then
         Vimp_Read("Lost focus")
+        return
     end
     if not focusedFrame.Click then
         Vimp_Read("Not clickable")
@@ -288,19 +305,3 @@ for index = 1, STATICPOPUP_NUMDIALOGS do
     _G["StaticPopup" .. index]:HookScript("OnShow", ShowPopup)
     _G["StaticPopup" .. index]:HookScript("OnHide", HidePopup)
 end
-
-local function ListFrames()
-    if not topFrame then
-        Vimp_Read("No frames")
-        return
-    end
-    Vimp_Read(topFrame:GetName() or "Anonymous")
-    if #focusStack == 0 then
-        return
-    end
-    for index = #focusStack, 1 do
-        Vimp_Read(focusStack[index]:GetName() or "Anonymous")
-    end
-end
-
-Vimp_AddCommand("frames", ListFrames)
