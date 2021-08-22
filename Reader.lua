@@ -134,10 +134,12 @@ local function Next(backward)
     if not topFrame then
         Vimp_Read("Lost focus")
         focusedFrame = nil
+        Vimp_Outline(nil)
         return
     end
     if not IsEligible(focusedFrame) then
         focusedFrame = nil
+        Vimp_Outline(nil)
     end
     local savedFocus = focusedFrame
     local text = Explore(topFrame, backward)
@@ -156,6 +158,7 @@ local function Next(backward)
         return
     end
     Vimp_Read(text)
+    Vimp_Outline(focusedFrame)
 end
 
 local function Click()
@@ -177,6 +180,10 @@ local function Click()
         Vimp_Read("Click: " .. Text(focusedFrame))
     end
     focusedFrame:Click()
+    if not IsEligible(focusedFrame) then
+        focusedFrame = nil
+        Vimp_Outline(nil)
+    end
 end
 
 local function PushFrame(frame)
@@ -195,6 +202,7 @@ local function PushFrame(frame)
     end
     topFrame = frame
     focusedFrame = nil
+    Vimp_Outline(nil)
     Next(false)
 end
 
@@ -229,6 +237,7 @@ local function DiscardFrame(frame)
         topFrame = nil
         Vimp_DisableKeyboard()
     end
+    Vimp_Outline(focusedFrame)
 end
 
 local shownContainers = 0
