@@ -1,8 +1,0 @@
-<Bindings>
-    <Binding name="VIMPCLICK" default="'" header="VIMP" />
-    <Binding name="VIMPPREV" default="[" />
-    <Binding name="VIMPNEXT" default="]" />
-    <Binding name="VIMPREPEAT" default="SHIFT-'" />
-    <Binding name="VIMPDEC" default="SHIFT-[" />
-    <Binding name="VIMPINC" default="SHIFT-]" />
-</Bindings>
