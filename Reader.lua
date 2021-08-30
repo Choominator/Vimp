@@ -1,6 +1,7 @@
 local openWindows = {}
 local topWindow = nil
 local focusedRegion = nil
+local clickState = nil
 
 -- Create the cursor outline
 local cursor = CreateFrame("Frame", nil, UIParent)
@@ -185,8 +186,30 @@ local function Next(backward)
     Read()
 end
 
+-- A coroutine that performs a click intended to last one frame
+local function ClickRoutine(button)
+    local targetRegion = focusedRegion
+    ExecuteFrameScript(targetRegion, "OnEnter", false)
+    ExecuteFrameScript(targetRegion, "OnMouseDown", button)
+    targetRegion:Click(button, true)
+    -- Yields twice because OnKeyDown is called before OnUpdate in the same frame and we need to wait a frame before releasing the mouse button
+    coroutine.yield()
+    coroutine.yield()
+    if not targetRegion:IsForbidden() and targetRegion:IsVisible() then
+        if targetRegion:GetButtonState() == "PUSHED" then
+            targetRegion:Click(button, false)
+        end
+        ExecuteFrameScript(targetRegion, "OnMouseUp", button)
+        ExecuteFrameScript(targetRegion, "OnLeave", false)
+    end
+    clickState = nil
+end
+
 -- Clicks on the currently focused element
 local function Click()
+    if clickState then
+        return
+    end
     if not focusedRegion or focusedRegion:IsForbidden() or not focusedRegion:IsVisible() then
         error("Called with an undefined, forbidden, or invisible focusedRegion")
     end
@@ -203,7 +226,8 @@ local function Click()
         text = (not focusedRegion:GetChecked() and "Checked" or "Unchecked") .. "\n"
     end
     Vimp_Say(text .. GetText(focusedRegion, false))
-    focusedRegion:Click()
+    clickState = coroutine.create(ClickRoutine)
+    coroutine.resume(clickState, "LeftButton")
 end
 
 -- Slides the currently focused element
@@ -338,11 +362,15 @@ local function OnCursorUpdate(frame)
     Refocus()
     if not focusedRegion then
         frame:Hide()
+        clickState = nil
         return
     end
     frame:SetPropagateKeyboardInput(false)
     frame:SetAllPoints(focusedRegion)
     frame:SetFrameLevel(10000)
+    if clickState then
+        coroutine.resume(clickState)
+    end
 end
 
 -- Handle keyboard events
@@ -388,4 +416,8 @@ end
 
 for index = 1, NUM_CONTAINER_FRAMES do
     _G["ContainerFrame" .. index]:HookScript("OnShow", OnPanelShow)
+end
+
+for index = 1, UIDROPDOWNMENU_MAXLEVELS do
+    _G["DropDownList" .. index]:HookScript("OnShow", OnPanelShow)
 end
