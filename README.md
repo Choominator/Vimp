@@ -2,7 +2,7 @@
 
 Vimp implements a screen-reader inside World of Warcraft.  It does so by leveraging the recently introduced text-to-speech API into the add-on sandbox which in turn relies on the host's operating system's speech capabilities.  At the moment it has generic code to read a lot of the game's user interface, even if not very efficiently for the user.  In the future I plan on adding specific modules to optimize the experience as well as add tools to aid in actual gameplay, within the bounds allowed by Blizzard's add-on sandbox.
 
-To demonstrate the add-on in action, I've made a [video](https://youtu.be/DUgVrluiWd4), however it no longer reflects the current state of the add-on since the code has been refactored and improved.
+To demonstrate the add-on in action, I've made a [video](https://youtu.be/DUgVrluiWd4), however it no longer reflects the current state of the add-on since the code has since been refactored and improved.
 
 ## Motivation
 
@@ -22,7 +22,18 @@ The easiest way to download this add-on is by visiting the [Releases](https://gi
 
 This add-on uses the same settings that are used to configure Blizzard's text-to-speech for chat, which at least in my installation of MacOS do not have sane defaults.  Blizzard's text-to-speech chat uses two configurable voices: one main and one alternative.  To configure the main voice, which is the one Vimp uses, just type `/tts voice id`, where id is a number representing the identification of the desired voice.  To configure the alternative voice, type the same command but with `altvoice` instead of `voice`.  The speech rate can be configured by typing `/tts speed value`, where a value of 0 means the default rate, lower values reduce the rate, and higher values increas it.  On my system, and as can be heard in the video linked above, I use the Samantha voice which has ID 11, and speed 3, however I'm not sure whether the IDs are the same for everyone.
 
-This add-on overrides your key bindings by making its visual indicator the topmost frame on the screen and selectively consuming the keys that it uses for navigation.  I did it this way because that was the only way I could find to override key bindings in combat as well as because certain panes also consume keyboard input so I had to find a way to consume it first.  The keys that are used for navigation are `TAB` and `SHIFT-TAB` to move to the next and previous elements respectively, `CTRL-TAB` to switch between windows, `SPACE` to read the selected element, `ENTER` to click on an element, and `RIGHT`, `LEFT`, `DOWN`, and `UP` to increase and decrease slider values in coarse or fine steps respectively.  Modified clicking can be achieved by pressing the desired modifier along with `ENTER`.
+This add-on overrides your key bindings by making its visual indicator the topmost frame on the screen and selectively consuming the keys that it uses for navigation.  I did it this way because that was the only way I could find to override key bindings in combat as well as because certain panes also consume keyboard input so I had to find a way to consume it first.
+
+The keys that are used for navigation are as follows:
+
+* `LEFT` - Moves the cursor to the previous element, slides the thumb left or up when interacting with a Slider;
+* `RIGHT` - Moves the cursor to the next element, slides the thumb right or down when interacting with a Slider;
+* `DOWN` - Interacts with the selected element, or performs a click on a Button;
+* `UP` - Moves the cursor to the parent element;
+* `SHIFT-LEFT` - Moves the thumb left or up in fine steps when interacting with a slider;
+* `SHIFT-RIGHT` - Moves the thumb right or down in fine steps when interacting with a slider;
+* `SHIFT-DOWN` - Reads the specified element, including its tooltip when available;
+* `SHIFT-UP` - Switches to another window.
 
 ## Caveats
 

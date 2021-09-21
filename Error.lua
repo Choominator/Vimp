@@ -1,4 +1,3 @@
--- Locates the specified frame type in the specified frame's hierarchy
 local function Search(frame, type)
     if frame:IsObjectType(type) then
         return frame
@@ -12,7 +11,6 @@ local function Search(frame, type)
     return nil
 end
 
--- Reads the text from the Lua errors frame
 local function Read()
     local errorFrame = Search(ScriptErrorsFrame, "EditBox")
     if not errorFrame then
@@ -22,7 +20,6 @@ local function Read()
     Vimp_Say(errorFrame:GetDisplayText())
 end
 
--- Warns when Lua errors are displayed
 local function OnShow(frame)
     Vimp_Say("Lua errors")
 end

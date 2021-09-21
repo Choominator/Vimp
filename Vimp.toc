@@ -1,8 +1,19 @@
 ## Interface: 90100
 ## Title: Vimp
 ## Author: João Santos
-## Version: 0.0.2
+## Version: 0.1.0
 
 Vimp.lua
 Error.lua
+Driver.lua
 Reader.lua
+Util.lua
+FontString.lua
+Button.lua
+CheckButton.lua
+Slider.lua
+Scroll.lua
+Window.lua
+Panel.lua
+Container.lua
+Popup.lua
