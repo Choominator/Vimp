@@ -19,8 +19,8 @@ local function Describe(...)
     if not speak then
         return strings
     end
-    table.insert(strings, "Check Button")
-    table.insert(strings, region:GetChecked() and "Checked" or "Not checked")
+    table.insert(strings, "Toggle")
+    table.insert(strings, region:GetChecked() and "On" or "Off")
     if not region:IsEnabled() then
         table.insert(strings, "Disabled")
     end
@@ -37,7 +37,7 @@ local function Activate()
         Vimp_Say("Disabled!")
         return
     end
-    local strings = {focus:GetChecked() and "Uncheck" or "Check"}
+    local strings = {focus:GetChecked() and "Deactivate" or "Activate"}
     Describe(focus, strings)
     Vimp_Say(strings)
     focus:Click()

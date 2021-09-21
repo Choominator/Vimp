@@ -10,7 +10,7 @@ Reader.lua
 Util.lua
 FontString.lua
 Button.lua
-CheckButton.lua
+Toggle.lua
 Slider.lua
 Scroll.lua
 Window.lua
