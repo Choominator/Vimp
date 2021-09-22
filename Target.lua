@@ -62,13 +62,13 @@ local function Describe()
     end
     local health = UnitHealth("target")
     local maxHealth = UnitHealthMax("target")
-    if health and maxHealth then
+    if health and maxHealth and maxHealth > 0 then
         table.insert(strings, string.format("%d%% Health", math.floor(health / maxHealth * 100 + 0.5)))
     end
     local power = UnitPower("target")
     local maxPower = UnitPowerMax("target")
     local _, powerType = UnitPowerType("target")
-    if power and maxPower and powerType then
+    if power and maxPower and maxPower > 0 and powerType then
         table.insert(strings, string.format("%d%% %s", math.floor(power / maxPower * 100 + 0.5), powerType))
     end
     if UnitIsCorpse("target") then
