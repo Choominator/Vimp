@@ -27,7 +27,7 @@ local function ItemProbe(region)
     if not name then
         return false
     end
-    if not name:find("^ContainerFrame%d+Item%d+$") then
+    if not name:find("^ContainerFrame%d+Item%d+$") and not name:find("^BankFrameItem%d+$") and not name:find("^ReagentBankFrameItem%d+$") then
         return false
     end
     return true
