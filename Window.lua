@@ -18,6 +18,10 @@ function Vimp_Window:CreateDriver(frame, probe, describe)
     self.Registry[frame] = driver
 end
 
+function Vimp_Window:Probe(frame)
+    return self.Registry[frame] ~= nil
+end
+
 local function Probe(region)
     return Vimp_Window.Registry[region] ~= nil
 end

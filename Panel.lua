@@ -20,7 +20,9 @@ local function Describe(...)
 end
 
 local function OnPanelShow(frame)
-    Vimp_Window:CreateDriver(frame, Probe, Describe)
+    if not Vimp_Window:Probe(frame) then
+        Vimp_Window:CreateDriver(frame, Probe, Describe)
+    end
     Vimp_Reader:HandleWindow(frame)
 end
 

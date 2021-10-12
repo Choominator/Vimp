@@ -35,7 +35,11 @@ function Vimp_Driver:ProbeRegion(region)
     end
     for index = #self.Registry, 1, -1 do
         local driver = self.Registry[index]
-        if driver.Probe(region) then
+        local probe = driver.Probe(region)
+        if probe == nil then
+            return nil
+        end
+        if probe then
             self.Cache[region] = driver
             return driver
         end
