@@ -16,7 +16,7 @@ It is my hope that one day Blizzard themselves implement something like this in 
 
 ## Installation
 
-The easiest way to download this add-on is by visiting the [Releases](https://github.com/Choominator/Vimp/releases) page, where GitHub conveniently compresses tagged versions for easy distribution.  To install just decompress the downloaded file or clone this git repository in the `_retail_/Interface/AddOns` folder inside the folder where World of Warcraft is installed, which by default is `/Applications/World of Warcraft/_retail_/Interface/AddOns/` on MacOS or `C:\Program Files\World of Warcraft\_retail_\Interface\AddOns\` on Windows.  After that just launch the game and the add-on should be automatically activated.
+The easiest way to download this add-on is by visiting the [Releases](https://github.com/Choominator/Vimp/releases) page, where GitHub conveniently compresses tagged versions for easy distribution.  To install just decompress the downloaded file or clone this git repository in the `_retail_/Interface/AddOns` folder inside the folder where World of Warcraft is installed, which by default is `/Applications/World of Warcraft/_retail_/Interface/AddOns/` on MacOS or `C:\Program Files\World of Warcraft\_retail_\Interface\AddOns\` on Windows, and make sure that the add-on's folder is named exactly `Vimp` without the trailing version tag.  After that just launch the game and the add-on should be automatically activated.
 
 ## Setup
 
