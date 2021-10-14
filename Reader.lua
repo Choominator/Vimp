@@ -1,6 +1,7 @@
 Vimp_Reader = {}
 
 Vimp_Reader.Windows = {}
+Vimp_Reader.Enabled = true
 
 Vimp_Reader.Cursor = CreateFrame("Frame", nil, UIParent)
 local top = Vimp_Reader.Cursor:CreateLine()
@@ -87,8 +88,21 @@ function Vimp_Reader:Pop()
     table.remove(window)
 end
 
+function Vimp_Reader:Enable()
+    self.Enabled = true
+    self.Cursor:Show()
+end
+
+function Vimp_Reader:Disable()
+    self.Enabled = false
+    self.Cursor:Hide()
+end
+
 function Vimp_Reader:Refresh()
     local savedWindow = self.ActiveWindow
+    if not savedWindow then
+        return
+    end
     local savedFocus = savedWindow[#savedWindow]
     local index = 1
     local window = self.Windows[1]
@@ -246,6 +260,9 @@ function Vimp_Reader:Dismiss()
 end
 
 local function OnUpdate(frame)
+    if not Vimp_Reader.Enabled then
+        return
+    end
     Vimp_Reader:Refresh()
     local focus = Vimp_Reader:GetFocus()
     if not focus then
