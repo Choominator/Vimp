@@ -14,7 +14,6 @@ local function Describe(...)
     if not speak then
         return strings
     end
-    table.insert(strings, "Container")
     Vimp_Say(strings)
 end
 
