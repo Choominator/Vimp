@@ -70,3 +70,33 @@ function Vimp_ReadTooltip(frame)
     end
     Vimp_Say(strings)
 end
+
+function Vimp_Levenshtein(left, right)
+    local matrix = {}
+    local cols = left:len()
+    local rows = right:len()
+    if cols == 0 then
+        return rows
+    end
+    if rows == 0 then
+        return cols
+    end
+    for index = 0, cols do
+        matrix[index] = index
+    end
+    for index = 1, rows do
+        matrix[index * (cols + 1)] = index
+    end
+    for row = 1, rows do
+        if right:byte(row) and right:byte(row) >= 0x80 then
+            return nil
+        end
+        for col = 1, cols do
+            if left:byte(col) and left:byte(col) >= 0x80 then
+                return nil
+            end
+            matrix[row * (cols + 1) + col] = min(min(matrix[row * (cols + 1) + col - 1] + 1, matrix[(row - 1) * (cols + 1) + col] + 1), matrix[(row - 1) * (cols + 1) + col - 1] + (left:byte(col) ~= right:byte(row) and 1 or 0))
+        end
+    end
+    return matrix[(rows + 1) * (cols + 1) - 1]
+end

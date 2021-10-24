@@ -1,15 +1,18 @@
 Vimp_Marks = {}
 
+local destination = nil
+local maps = {}
+
 local function Direction(cos, sin)
     local direction = ""
     if sin >= 0.5 then
         direction = "North"
-    elseif sin <= 0.5 then
+    elseif sin <= -0.5 then
         direction = "South"
     end
     if cos >= 0.5 then
         direction = direction .. "East"
-    elseif cos <= 0.5 then
+    elseif cos <= -0.5 then
         direction = direction .. "West"
     end
     return direction
@@ -125,6 +128,39 @@ local function MapDistance(fromMap, fromX, fromY, toMap, toX, toY)
     return distance, map, cos, sin
 end
 
+local function AnnounceDestination()
+    if not destination then
+        Vimp_Print("Destination not set")
+        return
+    end
+    local currentMap = C_Map.GetBestMapForUnit("player")
+    local currentPosition = C_Map.GetPlayerMapPosition(currentMap, "player")
+    if not currentPosition then
+        return
+    end
+    local distance, ascendantMap, destinationCos, destinationSin = MapDistance(currentMap, currentPosition.x, currentPosition.y, destination.map.mapID, destination.x, destination.y)
+    if distance < 5 then
+        Vimp_Print(string.format("You have arrived at the desired location in %s", destination.map.name))
+        destination = nil
+        return
+    end
+    local direction = Direction(destinationCos, destinationSin)
+    local angle = GetPlayerFacing()
+    if not angle then
+        return nil
+    end
+    local facingCos = -math.sin(angle)
+    local facingSin = math.cos(angle)
+    local cosDiff = facingCos * destinationCos + facingSin * destinationSin
+    local sinDiff = facingCos * destinationSin - facingSin * destinationCos
+    local clockAngle = -math.acos(cosDiff)
+    if sinDiff < 0 then
+        clockAngle = -clockAngle
+    end
+    local clockOrientation = math.floor((clockAngle - math.pi / 12) % (math.pi * 2) / (math.pi * 2) * 12 + 1)
+    Vimp_Say(string.format("Destination %d yards to the %s, at %d o'clock", math.floor(distance), direction, clockOrientation))
+end
+
 local function Mark(mnemonic)
     if not mnemonic or mnemonic == "" then
         Vimp_Print("Usage: mark mnemonic")
@@ -200,16 +236,19 @@ local function Recall(mnemonic)
                 chosenSin = sin
             end
         end
-        if chosenMap ~= nil then
+        if chosenMap then
             local zone = {}
-            while chosenMap ~= 0 do
-                local info = C_Map.GetMapInfo(chosenMap)
+            local ascendantMap = chosenMap
+            while ascendantMap ~= 0 do
+                local info = C_Map.GetMapInfo(ascendantMap)
                 if info.mapType < Enum.UIMapType.Continent then
                     break
                 end
                 table.insert(zone, info.name)
-                chosenMap = info.parentMapID
+                ascendantMap = info.parentMapID
             end
+            local info = C_Map.GetMapInfo(chosenMap)
+            destination = {map = info, x = chosenCoords.x, y = chosenCoords.y}
             local zone = table.concat(zone, ", ")
             local x = math.ceil(chosenCoords.x * 10000) / 100
             local y = math.ceil(chosenCoords.y * 10000) / 100
@@ -243,13 +282,96 @@ local function Recall(mnemonic)
     local y = math.ceil(mark.y * 10000) / 100
     if math.floor(distance) < 5 then
         Vimp_Print(string.format("Recalling mark right here in %s: %.02f, %.02f", info.name, x, y))
+        destination = nil
         return
     end
+    destination = {map = info, x = x / 100, y = y / 100}
     local direction = Direction(cos, sin)
     Vimp_Print(string.format("Recalling mark %d yards to the %s in %s: %.02f, %.02f", math.floor(distance), direction, info.name, x, y))
+end
+
+local function GoTo(coords)
+    local x, y, mapName = coords:match("^%s*(%d+%.%d+)%s+(%d+%.%d+)%s*(.*)%s*$")
+    if not x or not y then
+        x, y, mapName = coords:match("^%s*(%d+)%s+(%d+)%s*(.*)%s*$")
+    end
+    if not x or not y then
+        Vimp_Print("Usage: goto x y zone")
+        return
+    end
+    local x = tonumber(x) / 100
+    local y = tonumber(y) / 100
+    if x < 0 or x >= 1 or y < 0 or y >= 1 then
+        Vimp_Print("Coordinates must be within the range 0 through 100")
+        return
+    end
+    local currentMap = C_Map.GetBestMapForUnit("player")
+    local currentPosition = C_Map.GetPlayerMapPosition(currentMap, "player")
+    if not currentPosition then
+        Vimp_Print("Unable to determine your current position in a dungeon, battleground, or arena")
+        return
+    end
+    local currentMap = C_Map.GetMapInfo(currentMap)
+    if mapName == "" then
+        mapName = currentMap.name
+    end
+    local comparableMapName = mapName:upper()
+    local mapNameLen = mapName:len()
+    local chosenDiff = mapNameLen
+    local candidateMaps = {}
+    for index, candidateMap in pairs(maps) do
+        local minDiff = max(0, candidateMap.name:len() - mapNameLen)
+        local diff = Vimp_Levenshtein(comparableMapName, candidateMap.name:upper()) - minDiff
+        if diff <= chosenDiff then
+            if diff < chosenDiff then
+                chosenDiff = diff
+                table.wipe(candidateMaps)
+            end
+            table.insert(candidateMaps, candidateMap)
+        end
+    end
+    local chosenMap = nil
+    local chosenDistance = math.huge
+    for index, candidateMap in pairs(candidateMaps) do
+        local distance, ascendantMap = MapDistance(currentMap.mapID, currentPosition.x, currentPosition.y, candidateMap.mapID, x, y)
+        local ascendantMap = C_Map.GetMapInfo(ascendantMap)
+        if distance < chosenDistance and ascendantMap.mapType >= Enum.UIMapType.Continent then
+            chosenMap = candidateMap
+            chosenDistance = distance
+        end
+    end
+    if not chosenMap then
+        while currentMap.mapType > Enum.UIMapType.Continent do
+            currentMap = C_Map.GetMapInfo(currentMap.parentMapID)
+        end
+        local strings = {}
+        table.insert(strings, string.format("Unable to locate any map named %s or an approximation of that in %s", mapName, currentMap.name))
+        for index, candidateMap in pairs(candidateMaps) do
+            local zoneName = candidateMap.name
+            while candidateMap.mapType > Enum.UIMapType.Continent do
+                candidateMap = C_Map.GetMapInfo(candidateMap.parentMapID)
+            end
+            local continentName = candidateMap.name
+            table.insert(strings, string.format("Best match: %s in %s", zoneName, continentName))
+        end
+        Vimp_Print(table.concat(strings, "\n"))
+        return
+    end
+    destination = {map = chosenMap, x = x, y = y}
+    local x = math.ceil(x * 10000) / 100
+    local y = math.ceil(y * 10000) / 100
+    Vimp_Print(string.format("Tracking: %s: %.02f, %.02f", chosenMap.name, x, y))
+end
+
+for index, info in pairs(C_Map.GetMapChildrenInfo(946, nil, true)) do
+    if info.mapType >= Enum.UIMapType.Continent and info.mapType <= Enum.UIMapType.Zone then
+        table.insert(maps, info)
+    end
 end
 
 Vimp_AddCommand("nav", Navigation)
 Vimp_AddCommand("mark", Mark)
 Vimp_AddCommand("unmark", Unmark)
 Vimp_AddCommand("recall", Recall)
+Vimp_AddCommand("goto", GoTo)
+Vimp_AddCommand("dest", AnnounceDestination)
