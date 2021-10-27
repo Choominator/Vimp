@@ -5,7 +5,7 @@ local function Read()
     end
     local errorFrame = ScriptErrorsFrame:GetEditBox()
     Vimp_Shut()
-    Vimp_Say(errorFrame:GetDisplayText())
+    Vimp_Say(errorFrame:GetText())
     errorFrame:SetFocus()
     errorFrame:HighlightText()
 end
