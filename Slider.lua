@@ -2,8 +2,7 @@ local function Probe(region)
     return region:GetObjectType() == "Slider"
 end
 
-local function Describe(...)
-    local region, strings = ...
+local function Describe(region, strings)
     local speak = false
     if not strings then
         region = Vimp_Reader:GetFocus()
@@ -22,11 +21,19 @@ local function Describe(...)
     Vimp_Say(strings)
 end
 
-local function Next(backward)
+local function Activate()
+    Vimp_Say("Not interactable!  Use the arrow keys to move the slider's thumb.")
+end
+
+local function Direct(direction)
     local focus = Vimp_Reader:GetFocus()
     if not focus:IsEnabled() then
         Vimp_Say("Disabled!")
         return
+    end
+    local backward = false
+    if direction == "UP" or direction == "LEFT" then
+        backward = true
     end
     local low, high = focus:GetMinMaxValues()
     local current = focus:GetValue()
@@ -45,29 +52,4 @@ local function Next(backward)
     Vimp_Say(strings)
 end
 
-local function Activate()
-    local focus = Vimp_Reader:GetFocus()
-    local parent = Vimp_Reader:GetParent()
-    if focus == parent then
-        Vimp_Say("Already interacting with the Slider")
-        return
-    end
-    local strings = {"Entering"}
-    Describe(focus, strings)
-    Vimp_Say(strings)
-    Vimp_Reader:Push(focus)
-end
-
-local function Dismiss()
-    local focus = Vimp_Reader:GetFocus()
-    local parent = Vimp_Reader:GetParent()
-    if focus ~= parent then
-        error("Cannot dismiss a slider that is not being interacted with", 2)
-    end
-    local strings = {"Exiting"}
-    Describe(parent, strings)
-    Vimp_Say(strings)
-    Vimp_Reader:Pop()
-end
-
-Vimp_Driver:Create(Probe, Describe, Next, Activate, Dismiss)
+Vimp_Driver:Create(Probe, Describe, Vimp_Dummy, Activate, Vimp_Dummy, Direct)

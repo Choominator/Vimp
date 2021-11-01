@@ -3,7 +3,7 @@ Vimp_Driver = {}
 Vimp_Driver.Registry = {}
 Vimp_Driver.Cache = {}
 
-function Vimp_Driver:Create(probe, describe, next, activate, dismiss)
+function Vimp_Driver:Create(probe, describe, next, activate, dismiss, direct)
     if type(probe) ~= "function" then
         error("Driver's probe member must be a function", 2)
     end
@@ -18,6 +18,9 @@ function Vimp_Driver:Create(probe, describe, next, activate, dismiss)
     end
     if type(dismiss) ~= "function" then
         error("Driver's dismiss member must be a function", 2)
+            if type(direct) ~= "function" then
+                error("Driver's direct member must be a function", 2)
+            end
     end
     local driver = {}
     driver.Probe = probe
@@ -25,6 +28,7 @@ function Vimp_Driver:Create(probe, describe, next, activate, dismiss)
     driver.Next = next
     driver.Activate = activate
     driver.Dismiss = dismiss
+    driver.Direct = direct
     table.insert(self.Registry, driver)
 end
 

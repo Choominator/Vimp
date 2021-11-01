@@ -100,3 +100,7 @@ function Vimp_Levenshtein(left, right)
     end
     return matrix[(rows + 1) * (cols + 1) - 1]
 end
+
+function Vimp_Dummy()
+    error("This function must never be called", 2)
+end

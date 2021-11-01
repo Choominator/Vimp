@@ -28,8 +28,7 @@ local function HybridDescribe(region, strings)
     return strings
 end
 
-local function Describe(...)
-    local region, strings = ...
+local function Describe(region, strings)
     local speak = false
     if not strings then
         region = Vimp_Reader:GetFocus()
@@ -197,4 +196,4 @@ local function Dismiss()
     Describe()
 end
 
-Vimp_Driver:Create(Probe, Describe, Next, Activate, Dismiss)
+Vimp_Driver:Create(Probe, Describe, Next, Activate, Dismiss, Vimp_Dummy)

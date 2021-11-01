@@ -33,8 +33,7 @@ local function Probe(region)
     return region.Text ~= nil and region.Button ~= nil
 end
 
-local function Describe(...)
-    local region, strings = ...
+local function Describe(region, strings)
     local speak = false
     if not strings then
         region = Vimp_Reader:GetFocus()
@@ -55,10 +54,6 @@ local function Activate()
     local region = Vimp_Reader:GetFocus()
     Vimp_Say({"Click", region.Text:GetText()})
     ExecuteFrameScript(region.Button, "OnMouseDown", "LeftButton")
-end
-
-local function Dummy()
-    error("This function must never be called", 2)
 end
 
 local function MenuDescribe()
@@ -127,12 +122,11 @@ local function MenuActivate()
         return
     end
     Vimp_Say({"Click", focus:GetText()})
-    if _G[focus:GetName() .. "ExpandArrow"] then
-        ExecuteFrameScript(focus, "OnEnter", false)
-        ExecuteFrameScript(focus, "OnLeave", false)
-    else
+    ExecuteFrameScript(focus, "OnEnter", false)
+    if not _G[focus:GetName() .. "ExpandArrow"] then
         focus:Click()
     end
+    ExecuteFrameScript(focus, "OnLeave", false)
 end
 
 local function MenuDismiss()
@@ -199,18 +193,16 @@ end
 
 local function OnCursorKeyDown(frame, key)
     frame:SetPropagateKeyboardInput(false)
-    if key == "DOWN" then
-        if not IsShiftKeyDown() then
-            MenuActivate()
-        else
-            MenuDescribe()
-        end
-    elseif key == "UP" then
+    if key == "SPACE" then
+        MenuDescribe()
+    elseif key == "ENTER" then
+        MenuActivate()
+    elseif key == "ESCAPE" then
         MenuDismiss()
-    elseif key == "LEFT" then
-        MenuNext(true)
-    elseif key == "RIGHT" then
+    elseif key == "DOWN" then
         MenuNext(false)
+    elseif key == "UP" then
+        MenuNext(true)
     else
         frame:SetPropagateKeyboardInput(true)
     end
@@ -218,6 +210,6 @@ end
 
 cursor:SetScript("OnUpdate", OnCursorUpdate)
 cursor:SetScript("OnKeyDown", OnCursorKeyDown)
-Vimp_Driver:Create(Probe, Describe, Dummy, Activate, Dummy)
+Vimp_Driver:Create(Probe, Describe, Vimp_Dummy, Activate, Vimp_Dummy, Vimp_Dummy)
 hooksecurefunc("UIDropDownMenu_CreateFrames", OnMenuCreate)
 OnMenuCreate()

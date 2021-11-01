@@ -26,8 +26,7 @@ local function Probe(region)
     return Vimp_Window.Registry[region] ~= nil
 end
 
-local function Describe(...)
-    local region, strings = ...
+local function Describe(region, strings)
     if not region then
         region = Vimp_Reader:GetRoot()
     end
@@ -83,4 +82,4 @@ local function Dismiss()
     Vimp_Say("Cannot exit a window!")
 end
 
-Vimp_Driver:Create(Probe, Describe, Next, Activate, Dismiss)
+Vimp_Driver:Create(Probe, Describe, Next, Activate, Dismiss, Vimp_Dummy)

@@ -2,8 +2,7 @@ local function Probe(region)
     return region:IsObjectType("Frame") and region:GetName():find("^ContainerFrame%d+$") ~= nil
 end
 
-local function Describe(...)
-    local region, strings = ...
+local function Describe(region, strings)
     local speak = false
     if not strings then
         region = Vimp_Reader:GetRoot()
@@ -44,8 +43,7 @@ local QualityStrings = {
     [7] = "Heirloom",
 }
 
-local function ItemDescribe(...)
-    local region, strings = ...
+local function ItemDescribe(region, strings)
     local speak = false
     if not strings then
         region = Vimp_Reader:GetFocus()
@@ -95,10 +93,6 @@ local function ItemDescribe(...)
     Vimp_Say(strings)
 end
 
-local function ItemNext(backward)
-    error("This function must never be called", 2)
-end
-
 local function ItemActivate()
     local focus = Vimp_Reader:GetFocus()
     local strings = {"Click"}
@@ -107,14 +101,10 @@ local function ItemActivate()
     focus:Click()
 end
 
-local function ItemDismiss()
-    error("This function must never be called", 2)
-end
-
 for index = 1, NUM_CONTAINER_FRAMES do
     local frame = _G["ContainerFrame" .. index]
     Vimp_Window:CreateDriver(frame, Probe, Describe)
     frame:HookScript("OnShow", OnShow)
 end
 
-Vimp_Driver:Create(ItemProbe, ItemDescribe, ItemNext, ItemActivate, ItemDismiss)
+Vimp_Driver:Create(ItemProbe, ItemDescribe, Vimp_Dummy, ItemActivate, Vimp_Dummy, Vimp_Dummy)

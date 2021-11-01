@@ -2,8 +2,7 @@ local function Probe(region)
     return region:GetObjectType() == "CheckButton" and (region:GetName() ~= nil or Vimp_Validate(region:GetRegions()) or Vimp_Validate(region:GetChildren()))
 end
 
-local function Describe(...)
-    local region, strings = ...
+local function Describe(region, strings)
     local speak = false
     if not strings then
         region = Vimp_Reader:GetFocus()
@@ -27,10 +26,6 @@ local function Describe(...)
     Vimp_Say(strings)
 end
 
-local function Next(backward)
-    error("This function must never be called", 2)
-end
-
 local function Activate()
     local focus = Vimp_Reader:GetFocus()
     if not focus:IsEnabled() then
@@ -43,8 +38,4 @@ local function Activate()
     focus:Click()
 end
 
-local function Dismiss()
-    error("This function must never be called", 2)
-end
-
-Vimp_Driver:Create(Probe, Describe, Next, Activate, Dismiss)
+Vimp_Driver:Create(Probe, Describe, Vimp_Dummy, Activate, Vimp_Dummy, Vimp_Dummy)

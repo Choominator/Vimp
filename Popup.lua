@@ -2,8 +2,7 @@ local function Probe(region)
     return region:IsObjectType("Frame") and region:GetName():find("^StaticPopup%d+$") ~= nil
 end
 
-local function Describe(...)
-    local region, strings = ...
+local function Describe(region, strings)
     local speak = false
     if not strings then
         region = Vimp_Reader:GetRoot()

@@ -2,8 +2,7 @@ local function Probe(region)
     return region:GetObjectType() == "FontString" and region:GetText() ~= nil and region:GetText():find("%S") ~= nil
 end
 
-local function Describe(...)
-    local region, strings = ...
+local function Describe(region, strings)
     local speak = false
     if not strings then
         region = Vimp_Reader:GetFocus()
@@ -17,16 +16,8 @@ local function Describe(...)
     Vimp_Say(strings)
 end
 
-local function Next(backward)
-    error("This function must never be called", 2)
-end
-
 local function Activate()
     Vimp_Say("Not interactable!")
 end
 
-local function Dismiss()
-    error("This function must never be called", 2)
-end
-
-Vimp_Driver:Create(Probe, Describe, Next, Activate, Dismiss)
+Vimp_Driver:Create(Probe, Describe, Vimp_Dummy, Activate, Vimp_Dummy, Vimp_Dummy)

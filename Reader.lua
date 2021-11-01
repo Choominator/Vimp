@@ -259,6 +259,18 @@ function Vimp_Reader:Dismiss()
     driver.Dismiss()
 end
 
+function Vimp_Reader:Direct(key)
+    local window = self.ActiveWindow
+    local region = window[#window]
+    local driver = Vimp_Driver:ProbeRegion(region)
+    if driver.Direct == Vimp_Dummy then
+        self.Cursor:SetPropagateKeyboardInput(true)
+        return
+    end
+    Vimp_Shut()
+    driver.Direct(key)
+end
+
 local function OnUpdate(frame)
     if not Vimp_Reader.Enabled then
         return
@@ -275,22 +287,22 @@ end
 
 local function OnKeyDown(frame, key)
     frame:SetPropagateKeyboardInput(false)
-    if key == "DOWN" then
-        if not IsShiftKeyDown() then
-            Vimp_Reader:Activate()
-        else
-            Vimp_Reader:Describe()
-        end
-    elseif key == "UP" then
-        if not IsShiftKeyDown() then
-            Vimp_Reader:Dismiss()
+    if key == "TAB" then
+        if not IsControlKeyDown() then
+            Vimp_Reader:Next(IsShiftKeyDown())
         else
             Vimp_Reader:SwitchWindow()
         end
-    elseif key == "LEFT" then
-        Vimp_Reader:Next(true)
-    elseif key == "RIGHT" then
-        Vimp_Reader:Next(false)
+    elseif key == "ENTER" then
+        Vimp_Reader:Activate()
+    elseif key == "ESCAPE" and Vimp_Reader:GetParent() ~= Vimp_Reader:GetRoot() then
+        Vimp_Reader:Dismiss()
+    elseif key == "SPACE" then
+        Vimp_Reader:Describe()
+    elseif key == "DOWN" or key == "UP" or key == "LEFT" or key == "RIGHT" then
+        Vimp_Reader:Direct(key)
+    elseif key == "LCTRL" or key == "RCTRL" then
+        Vimp_Shut()
     else
         frame:SetPropagateKeyboardInput(true)
     end

@@ -2,8 +2,7 @@ local function Probe(region)
     return region:GetName() == "KeyBindingFrame"
 end
 
-local function Describe(...)
-    local region, strings = ...
+local function Describe(region, strings)
     local speak = false
     if not strings then
         region = Vimp_Reader:GetRoot()
@@ -37,8 +36,7 @@ local function ItemProbe(region)
     return true
 end
 
-local function ItemDescribe(...)
-    local region, strings = ...
+local function ItemDescribe(region, strings)
     local speak = false
     if not strings then
         region = Vimp_Reader:GetFocus()
@@ -132,4 +130,4 @@ local function OnPanelShow(frame)
 end
 
 hooksecurefunc("ShowUIPanel", OnPanelShow)
-Vimp_Driver:Create(ItemProbe, ItemDescribe, ItemNext, ItemActivate, ItemDismiss)
+Vimp_Driver:Create(ItemProbe, ItemDescribe, ItemNext, ItemActivate, ItemDismiss, Vimp_Dummy)
