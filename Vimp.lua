@@ -4,10 +4,10 @@ function Vimp_Say(message)
     end
     message = message:gsub("(%P)%s*\n", "%1, ")
     message = message:gsub("(%l)(%u)", "%1 %2")
-    local voice = TextToSpeech_GetSelectedVoice("standard").voiceID
+    local voice = TextToSpeech_GetSelectedVoice(Enum.TtsVoiceType.Standard).voiceID
     local destination = Enum.VoiceTtsDestination.ScreenReader
-    local rate = TEXTTOSPEECH_CONFIG.speechRate
-    local volume = TEXTTOSPEECH_CONFIG.speechVolume
+    local rate = C_TTSSettings.GetSpeechRate()
+    local volume = C_TTSSettings.GetSpeechVolume()
     C_VoiceChat.SpeakText(voice, message, destination, rate, volume)
 end
 
